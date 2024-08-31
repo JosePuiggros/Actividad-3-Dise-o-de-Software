@@ -1,0 +1,90 @@
+<html>
+<link rel="stylesheet" href="styles.css">
+  <body>
+    <div id="app"></div>
+
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/jsx">
+      const app = document.getElementById("app");
+
+      function Header({ title }) {
+        return <h1 style={{ textAlign: "center" }}>{title ? title : "Califica una Película"}</h1>;
+      }
+
+      function MovieRating({ movie, selectedRating, isFavorite, onRate, onToggleFavorite }) {
+        return (
+          <div style={{ marginBottom: "20px", textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <p>Favorita </p>
+            <label className="switch">
+              <input type="checkbox" checked={isFavorite} onChange={() => onToggleFavorite(movie)} />
+              <span className="slider"></span>
+            </label>
+            <p style={{ fontSize: "18px", fontWeight: "bold", marginRight: "10px" }}>{movie}</p>
+            <div>
+              {[...Array(10)].map((_, index) => {
+                const rating = index + 1;
+                return (
+                  <button
+                    key={rating}
+                    onClick={() => onRate(movie, rating)}
+                    style={{
+                      margin: "5px",
+                      backgroundColor: selectedRating === rating ? "#4CAF50" : "#f0f0f0",
+                      color: selectedRating === rating ? "white" : "black",
+                    }}
+                  >
+                    {rating}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      }
+
+      function HomePage() {
+        const movies = ["Sexto Sentido", "Breaking Bad", "Interstellar", "Isla Siniestra", "The Truman Show"];
+        const [ratings, setRatings] = React.useState({});
+        const [favorites, setFavorites] = React.useState({});
+        const [message, setMessage] = React.useState("");
+
+        function handleRate(movie, rating) {
+          setRatings((prevRatings) => ({
+            ...prevRatings,
+            [movie]: rating,
+          }));
+          setMessage(`Has clasificado la película "${movie}" con un ${rating}/10.`);
+        }
+
+        function handleToggleFavorite(selectedMovie) {
+          setFavorites({
+            [selectedMovie]: true,
+          });
+        }
+
+        return (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <Header title="Selecciona y Califica una Pelicula" />
+            {movies.map((movie) => (
+              <MovieRating
+                key={movie}
+                movie={movie}
+                selectedRating={ratings[movie]}
+                isFavorite={!!favorites[movie]}
+                onRate={handleRate}
+                onToggleFavorite={handleToggleFavorite}
+              />
+            ))}
+            {message && <p>{message}</p>}
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(app);
+      root.render(<HomePage />);
+    </script>
+  </body>
+</html>
